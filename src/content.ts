@@ -29,6 +29,10 @@ async function handleContentLoaded() {
     return;
   }
 
+  if (document.location.href.match(/^https?:\/\/jsonhero\.io/)) {
+    return;
+  }
+
   const doc = await createNewDocument(
     document.location.href,
     extractedJson,
