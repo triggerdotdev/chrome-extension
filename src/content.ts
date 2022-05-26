@@ -39,11 +39,12 @@ async function handleContentLoaded() {
     settings.serverUrl
   );
 
+  const jsonHeroUrl = new URL(doc.location);
+  jsonHeroUrl.searchParams.append("theme", settings.theme ?? "dark");
+
   // Replace the contents of body with a single iframe pointing to doc.location
   const iframe = document.createElement("iframe");
-  iframe.src = doc.location;
-  iframe.sandbox.add("allow-scripts");
-  iframe.sandbox.add("allow-same-origin");
+  iframe.src = jsonHeroUrl.href;
   iframe.style.position = "fixed";
   iframe.style.top = "0";
   iframe.style.left = "0";

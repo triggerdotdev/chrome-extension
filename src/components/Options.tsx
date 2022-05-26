@@ -24,7 +24,11 @@ export default function OptionsPage() {
 
 /* This example requires Tailwind CSS v2.0+ */
 function Options() {
-  const { data, isLoading, error } = useChromeStorage("autoMode", "serverUrl");
+  const { data, isLoading, error } = useChromeStorage(
+    "autoMode",
+    "serverUrl",
+    "theme"
+  );
 
   return (
     <div className="max-w-7xl mx-auto px-4 my-8 sm:px-6 lg:px-8">
@@ -69,6 +73,7 @@ function OptionsSettings({ settings }: { settings?: { [key: string]: any } }) {
         {
           serverUrl: formData.get("serverUrl") ?? settings?.serverUrl,
           autoMode: formData.get("autoMode") === "on",
+          theme: formData.get("theme"),
         },
         function () {
           console.log("Settings saved");
@@ -132,6 +137,12 @@ function OptionsSettings({ settings }: { settings?: { [key: string]: any } }) {
           <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
             <div className="sm:col-span-4">
               <AutoModeToggle enabled={settings?.autoMode} />
+            </div>
+          </div>
+
+          <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+            <div className="sm:col-span-4">
+              <SettingsTheme theme={settings?.theme} />
             </div>
           </div>
         </div>
@@ -228,6 +239,28 @@ function SettingsSavedMessage({ onDismiss }: { onDismiss: () => void }) {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function SettingsTheme({ theme }: { theme: string }) {
+  return (
+    <div>
+      <label
+        htmlFor="theme"
+        className="block text-sm font-medium text-gray-700"
+      >
+        Theme
+      </label>
+      <select
+        id="theme"
+        name="theme"
+        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+        defaultValue={theme}
+      >
+        <option value="dark">Dark</option>
+        <option value="light">Light</option>
+      </select>
     </div>
   );
 }
