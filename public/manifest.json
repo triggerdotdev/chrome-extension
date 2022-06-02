@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "JSON Hero",
-  "description": "Easily send JSON to JSON Hero",
-  "version": "1.0.0",
+  "description": "A beautiful JSON explorer packed with features",
+  "version": "0.0.1",
   "author": "Eric Allam",
   "options_page": "options.html",
   "background": {

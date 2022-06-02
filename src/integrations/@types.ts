@@ -7,4 +7,5 @@ export type Settings = {
   autoMode?: boolean;
   serverUrl?: string;
   theme?: "dark" | "light";
+  defaultView?: "column" | "editor" | "tree";
 };

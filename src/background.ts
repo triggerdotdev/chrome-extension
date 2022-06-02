@@ -11,6 +11,7 @@ chrome.runtime.onInstalled.addListener(async function () {
     theme: defaultTheme,
     serverUrl: defaultServerUrl,
     autoMode: false,
+    defaultView: "column",
   });
 });
 
@@ -39,11 +40,24 @@ chrome.action.onClicked.addListener(async function (tab) {
 
       const settings = await getSettings();
 
+      console.log(`[background] creating doc with title: ${title}`);
+
       const doc = await createNewDocument(title, json, settings.serverUrl);
+
+      console.log(`[background] doc: ${JSON.stringify(doc)}`);
+
+      const jsonHeroUrl = new URL(doc.location);
+
+      jsonHeroUrl.searchParams.append("theme", settings.theme ?? "dark");
+
+      if (settings?.defaultView !== "column") {
+        jsonHeroUrl.pathname =
+          jsonHeroUrl.pathname + "/" + settings.defaultView;
+      }
 
       // Open the new tab
       chrome.tabs.create({
-        url: doc.location,
+        url: jsonHeroUrl.href,
         openerTabId: tab.id,
         active: true,
       });

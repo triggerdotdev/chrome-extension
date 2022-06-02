@@ -26,8 +26,12 @@ function getFirestoreTitle() {
 
 function getFirestoreDocuments() {
   return Array.from(document.querySelectorAll(".f7e-field-list"))
-    .map((fieldList, index) => {
-      return extractFirestoreDocument(fieldList as HTMLElement, index);
+    .map((fieldList, index, arr) => {
+      return extractFirestoreDocument(
+        fieldList as HTMLElement,
+        index,
+        arr.length
+      );
     })
     .filter((doc) => doc)
     .reverse() as Array<{ json: any; title: string }>;
@@ -35,7 +39,8 @@ function getFirestoreDocuments() {
 
 function extractFirestoreDocument(
   element: HTMLElement,
-  index: number
+  index: number,
+  length: number
 ):
   | {
       json: any;
@@ -63,11 +68,13 @@ function extractFirestoreDocument(
 
   return {
     json,
-    title: extractTitle(title, index),
+    title: extractTitle(title, index, length),
   };
 
-  function extractTitle(title: string, index: number) {
-    if (index === 1) {
+  function extractTitle(title: string, index: number, length: number) {
+    console.log(`[content-script] extracting title ${title}, index = ${index}`);
+
+    if (index === 1 || length === 1) {
       return title;
     }
 

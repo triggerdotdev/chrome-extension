@@ -11,7 +11,7 @@ const useChromeStorage = (...keys: string[]) =>
     () => {
       return chrome.storage.sync.get(keys);
     },
-    { staleTime: 100 }
+    { refetchInterval: 1 }
   );
 
 export default function OptionsPage() {
@@ -27,7 +27,8 @@ function Options() {
   const { data, isLoading, error } = useChromeStorage(
     "autoMode",
     "serverUrl",
-    "theme"
+    "theme",
+    "defaultView"
   );
 
   return (
@@ -74,11 +75,14 @@ function OptionsSettings({ settings }: { settings?: { [key: string]: any } }) {
           serverUrl: formData.get("serverUrl") ?? settings?.serverUrl,
           autoMode: formData.get("autoMode") === "on",
           theme: formData.get("theme"),
+          defaultView: formData.get("defaultView"),
         },
         function () {
           console.log("Settings saved");
 
           setShowSavedMessage(true);
+
+          queryClient.invalidateQueries("chromeStorage");
         }
       );
     },
@@ -98,6 +102,7 @@ function OptionsSettings({ settings }: { settings?: { [key: string]: any } }) {
     <form
       className="space-y-8 divide-y divide-gray-200"
       onSubmit={handleSubmit}
+      key={settings?.theme + settings?.autoMode + settings?.serverUrl}
     >
       {showSavedMessage && (
         <SettingsSavedMessage onDismiss={() => setShowSavedMessage(false)} />
@@ -136,13 +141,39 @@ function OptionsSettings({ settings }: { settings?: { [key: string]: any } }) {
 
           <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
             <div className="sm:col-span-4">
-              <AutoModeToggle enabled={settings?.autoMode} />
+              <AutoModeToggle
+                enabled={settings?.autoMode}
+                serverUrl={settings?.serverUrl}
+              />
             </div>
           </div>
 
           <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
             <div className="sm:col-span-4">
               <SettingsTheme theme={settings?.theme} />
+            </div>
+          </div>
+
+          <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+            <div className="sm:col-span-4">
+              <div>
+                <label
+                  htmlFor="defaultView"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Default view
+                </label>
+                <select
+                  id="defaultView"
+                  name="defaultView"
+                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                  defaultValue={settings?.defaultView}
+                >
+                  <option value="column">Column</option>
+                  <option value="editor">Editor</option>
+                  <option value="tree">Tree</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -172,7 +203,13 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-function AutoModeToggle({ enabled }: { enabled: boolean }) {
+function AutoModeToggle({
+  enabled,
+  serverUrl,
+}: {
+  enabled: boolean;
+  serverUrl?: string;
+}) {
   const [isChecked, setIsChecked] = React.useState(enabled);
 
   return (
@@ -185,9 +222,10 @@ function AutoModeToggle({ enabled }: { enabled: boolean }) {
         >
           Auto-mode
         </Switch.Label>
-        <Switch.Description as="span" className="text-sm text-gray-500">
+        <Switch.Description as="span" className="text-sm text-gray-500 mr-4">
           Turn on auto-mode to show JSON responses in JSON Hero without having
-          to click the button.
+          to click the toolbar button. Note that this will also automatically
+          send the JSON to {serverUrl ?? "https://jsonhero.io"}
         </Switch.Description>
       </span>
       <Switch

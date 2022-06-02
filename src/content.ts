@@ -33,6 +33,9 @@ async function handleContentLoaded() {
     return;
   }
 
+  console.log("Got JSON:");
+  console.log(JSON.stringify(extractedJson, null, 2));
+
   const doc = await createNewDocument(
     document.location.href,
     extractedJson,
@@ -41,6 +44,11 @@ async function handleContentLoaded() {
 
   const jsonHeroUrl = new URL(doc.location);
   jsonHeroUrl.searchParams.append("theme", settings.theme ?? "dark");
+  jsonHeroUrl.searchParams.append("minimal", "true");
+
+  if (settings.defaultView !== "column") {
+    jsonHeroUrl.pathname = jsonHeroUrl.pathname + "/" + settings.defaultView;
+  }
 
   // Replace the contents of body with a single iframe pointing to doc.location
   const iframe = document.createElement("iframe");
@@ -78,6 +86,9 @@ async function handleAction(sendResponse: (response: any) => void) {
     sendResponse({ success: false });
     return;
   }
+
+  console.log("Got JSON:");
+  console.log(JSON.stringify(options, null, 2));
 
   sendResponse({
     success: true,

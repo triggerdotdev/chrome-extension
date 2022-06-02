@@ -5,6 +5,7 @@ export async function getSettings(): Promise<Settings> {
     "theme",
     "serverUrl",
     "autoMode",
+    "defaultView",
   ]);
 
   return settings;
